@@ -383,7 +383,8 @@ Include up to 6 creditworthiness indicators and up to 10 most recent delivered t
       const base64 = await new Promise((res, rej) => { const r = new FileReader(); r.onload = () => res(r.result.split(",")[1]); r.onerror = rej; r.readAsDataURL(file); });
       messageContent = [{ type: "document", source: { type: "base64", media_type: "application/pdf", data: base64 } }, { type: "text", text: PROMPT }];
     }
-    const res = await fetch("http://localhost:3001/api/analyze", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ content: messageContent }) });
+    const API_BASE = process.env.NODE_ENV === "production" ? "" : "http://localhost:3001";
+    const res = await fetch(`${API_BASE}/api/analyze`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ content: messageContent }) });
     const data = await res.json();
     if (data.error) throw new Error(data.error);
     return JSON.parse(data.text.replace(/```json|```/g, "").trim());
