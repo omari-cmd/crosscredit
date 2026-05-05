@@ -667,7 +667,11 @@ export default function App() {
       {screen === "landing"   && <LandingPage onStart={() => setScreen("signup")} />}
       {screen === "signup"    && <SignupStep onNext={u => { setUser(u); setScreen("upload"); }} />}
       {screen === "upload"    && <UploadStep user={user} onNext={d => { setReportData(d); setScreen("results"); }} />}
-      {screen === "results"   && <ResultsStep data={reportData} onSubmit={() => setScreen("submitted")} />}
+      {screen === "results"   && <ResultsStep data={reportData} onSubmit={async () => {
+        const API_BASE = process.env.NODE_ENV === "production" ? "" : "http://localhost:3001";
+        try { await fetch(`${API_BASE}/api/submit`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ user, report: reportData }) }); } catch {}
+        setScreen("submitted");
+      }} />}
       {screen === "submitted" && <SubmissionStep data={reportData} />}
     </div>
     </>
